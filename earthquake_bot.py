@@ -107,6 +107,12 @@ def fetch_and_send():
 # Looping to check every X seconds
 if __name__ == '__main__':
     logger.info("Bot started. Monitoring earthquakes in Myanmar...")
+    try:
+        bot.send_message(chat_id=CHANNEL_ID, text="Test Message: Bot started successfully!")
+        logger.info("Test message sent successfully.")
+    except TelegramError as e:
+        logger.error(f"Failed to send test message: {e}")
+
     while True:
         fetch_and_send()
         time.sleep(CHECK_INTERVAL)
