@@ -4,8 +4,8 @@ from googletrans import Translator
 from telegram import Bot
 
 # SETTINGS
-BOT_TOKEN = 'YOUR_BOT_TOKEN'
-CHANNEL_ID = '@your_channel_username'
+BOT_TOKEN = 7931901384:AAERPZAarqhdvk49kAWVWid6tyCw8ai92dc
+CHANNEL_ID = +-yRQgtkqCwMxYzEx
 USGS_FEED = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson'
 CHECK_INTERVAL = 60  # in seconds
 
