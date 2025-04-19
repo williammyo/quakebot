@@ -13,6 +13,7 @@ __pycache__/
 # Earthquake state tracking
 chat_ids.txt
 last_*.txt
+broadcasted_quakes.txt
 data/
 
 # OS/Editor stuff
