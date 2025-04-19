@@ -1,0 +1,20 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Environment
+.env
+*.pem
+
+# Logs, temp files
+*.log
+*.png
+
+# Earthquake state tracking
+chat_ids.txt
+last_*.txt
+data/
+
+# OS/Editor stuff
+.DS_Store
+.vscode/
