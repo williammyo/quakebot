@@ -21,3 +21,6 @@ data/
 # OS/Editor stuff
 .DS_Store
 .vscode/
+
+#remote command
+discord_commands.py
