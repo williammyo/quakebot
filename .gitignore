@@ -4,6 +4,7 @@ __pycache__/
 
 # Environment
 .env
+venv/
 *.pem
 
 # Logs, temp files
