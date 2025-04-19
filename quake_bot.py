@@ -17,6 +17,7 @@ from telegram.error import TelegramError
 from matplotlib import font_manager
 import math
 from fbPost import post_image_to_facebook
+from pytz import timezone
 
 # ============ Setup ============ #
 nest_asyncio.apply()
@@ -95,27 +96,61 @@ def convert_utc_to_myanmar(utc_str):
 
 def fetch_quakes_from_rss():
     feed = feedparser.parse("https://earthquake.tmd.go.th/feed/rss_tmd.xml")
+    broadcasted_ids = load_broadcasted_ids()
+    new_quakes = []
+
+    pacific = timezone('US/Pacific')  # For Pacific Time logging
+
     for entry in feed.entries:
         try:
+            title = entry.title
             quake_id = entry.link.split("earthquake=")[-1]
+            if quake_id in broadcasted_ids:
+                continue  # already alerted
+
             lat = float(entry.get("geo_lat", 0.0))
             lon = float(entry.get("geo_long", 0.0))
             mag = float(entry.get("tmd_magnitude", 0.0))
             depth = float(entry.get("tmd_depth", 0.0))
             utc_time = entry.get("tmd_time", "")
-            return {
+            link = entry.link
+
+            # Ignore quakes smaller than 2.0
+            if mag < 2.0:
+                pacific_time = datetime.now(pacific).strftime("%m-%d-%Y %H:%M:%S %p")
+                logger.info(f"🟢 Magnitude {mag} earthquake ignored. ({pacific_time} PT)")
+                continue
+
+            is_myanmar = "เมียนมา" in title or "Myanmar" in title
+
+            # Only include non-Myanmar quakes if >= 3.0
+            if not is_myanmar and mag < 3.0:
+                pacific_time = datetime.now(pacific).strftime("%m-%d-%Y %H:%M:%S %p")
+                logger.info(f"🟢 Small quake outside Myanmar ignored.({pacific_time} PT)")
+                continue
+
+            # Logger for quakes that will trigger an alert
+            pacific_time = datetime.now(pacific).strftime("%m-%d-%Y %H:%M:%S %p")
+            logger.info(f"🔔 Magnitude {mag} earthquake detected. ({pacific_time} PT). Initiating Alerts across platforms.")
+
+            new_quakes.append({
                 "id": quake_id,
                 "lat": lat,
                 "lon": lon,
                 "mag": mag,
                 "depth": depth,
                 "date": utc_time,
-                "link": entry.link
-            }
+                "link": link
+            })
+
         except Exception as e:
             logger.warning(f"Error parsing RSS entry: {e}")
             continue
-    return None
+
+    return list(reversed(new_quakes))  # older quakes first
+
+
+
 
 def build_facebook_caption(fbemoji, mag, city_mm, distance_miles, mm_time, depth_km, lat, lon, link):
     return (
@@ -128,15 +163,15 @@ def build_facebook_caption(fbemoji, mag, city_mm, distance_miles, mm_time, depth
         f"ငလျင်သတင်းအရင်းအမြစ် ➤ {link}"
     )
 
-def load_last_event():
-    if not os.path.exists(LAST_EVENT_FILE):
-        return ""
-    with open(LAST_EVENT_FILE, 'r', encoding='utf-8') as f:
-        return f.read().strip()
+def load_broadcasted_ids():
+    if not os.path.exists("broadcasted_quakes.txt"):
+        return set()
+    with open("broadcasted_quakes.txt", "r", encoding="utf-8") as f:
+        return set(line.strip() for line in f.readlines())
 
-def save_last_event(text):
-    with open(LAST_EVENT_FILE, 'w', encoding='utf-8') as f:
-        f.write(text)
+def save_broadcasted_id(quake_id):
+    with open("broadcasted_quakes.txt", "a", encoding="utf-8") as f:
+        f.write(f"{quake_id}\n")
 
 def generate_map(lat, lon, output_file, mag=5.0, depth=10):
     api_key = os.getenv("GOOGLE_MAPS_API_KEY")
@@ -221,15 +256,17 @@ async def monitor_loop():
     bot = Bot(token=TOKEN)
     logger.info("QuakeBot: Bot started. Monitoring every 60s.")
     while True:
-        quake = fetch_quakes_from_rss()
-        if quake:
-            text_id = quake["id"]
-            if text_id != load_last_event():
+        new_quakes = fetch_quakes_from_rss()
+        if new_quakes:
+            for quake in new_quakes:
                 await send_alert(bot, quake)
-                save_last_event(text_id)
+                save_broadcasted_id(quake["id"])
+                await asyncio.sleep(2)
         else:
             logger.info("No earthquake detected. Waiting for the next check....")
         await asyncio.sleep(CHECK_INTERVAL)
+
+
 
 if __name__ == '__main__':
     try:
