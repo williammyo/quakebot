@@ -127,16 +127,16 @@ def fetch_quakes_from_rss():
             link = entry.link
 
             if mag < 2.0:
-                logger.info(f"🟢 Magnitude {mag} earthquake ignored. ({datetime.now(pacific)})")
+                logger.info(f"🟢 Magnitude {mag} earthquake ignored. ({get_pacific_time_str()} PT)")
                 continue
 
             is_myanmar = "เมียนมา" in title or "Myanmar" in title
 
             if not is_myanmar and mag < 3.0:
-                logger.info(f"🟢 Small quake outside Myanmar ignored. ({datetime.now(pacific)})")
+                logger.info(f"🟢 Small quake outside Myanmar ignored. ({get_pacific_time_str()} PT)")
                 continue
 
-            logger.info(f"🔔 Magnitude {mag} earthquake detected. ({datetime.now(pacific)}) Initiating Alerts.")
+            logger.info(f"🔔 Magnitude {mag} earthquake detected at ({get_pacific_time_str()} PT).Initiating Alerts.")
 
             new_quakes.append({
                 "id": quake_id,

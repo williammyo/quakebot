@@ -10,6 +10,14 @@ WEBHOOK_URL = os.getenv("DISCORD_LOG_WEBHOOK")
 class DiscordLogHandler(logging.Handler):
     def emit(self, record):
         log_entry = self.format(record)
+
+         # Skip repetitive low-value logs
+        if (
+            "No earthquake detected" in log_entry
+            or "earthquake ignored" in log_entry
+        ):
+            return
+        
         if record.levelno >= logging.ERROR:
             log_entry = f"<@squishvocado>\n**[ERROR]**\n{log_entry}"
         else:
