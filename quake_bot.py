@@ -43,6 +43,11 @@ LAST_EVENT_FILE = "last_quake_text.txt"
 FONT = font_manager.FontProperties(family="Arial Unicode MS") 
 BURMESE_DIGITS = "၀၁၂၃၄၅၆၇၈၉"
 
+def get_pacific_time_str():
+    pacific = timezone('US/Pacific')
+    return datetime.now(pacific).strftime("%H:%M")
+
+
 # ============ Load City JSON ============ #
 with open(CITIES_JSON, 'r', encoding='utf-8') as f:
     CITY_DATA = json.load(f)
@@ -106,8 +111,6 @@ def fetch_quakes_from_rss():
     feed = feedparser.parse("https://earthquake.tmd.go.th/feed/rss_tmd.xml")
     broadcasted_ids = load_broadcasted_ids()
     new_quakes = []
-
-    pacific = timezone('US/Pacific')
 
     for entry in feed.entries:
         try:
