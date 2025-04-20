@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 from datetime import datetime
+import json
 
 load_dotenv()
 DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
@@ -19,12 +20,12 @@ async def on_ready():
 
 @bot.command(name="status")
 async def status(ctx):
-    result = subprocess.run(["systemctl", "is-active", "quakebot"], stdout=subprocess.PIPE)
-    status = result.stdout.decode().strip()
-    if status == "active":
-        await ctx.send("Earthquake bot (systemd: quakebot) is **running**.")
-    else:
-        await ctx.send("Earthquake bot is **not running**.")
+    try:
+        with open("status.json", "r") as f:
+            data = json.load(f)
+            await ctx.send(f"✅ QuakeBot is running. Last check-in: `{data['time']}` UTC.")
+    except Exception:
+        await ctx.send("❌ Cannot communicate with QuakeBot.")
 
 @bot.command(name="restart")
 async def restart(ctx):
@@ -58,15 +59,14 @@ async def lastquake(ctx):
 @bot.command(name="log")
 async def log(ctx):
     try:
-        with open("discord.log", "r", encoding="utf-8") as f:
+        with open("latest_error.log", "r", encoding="utf-8") as f:
             lines = f.readlines()[-20:]  # last 20 lines
         log_output = "".join(lines)
         if not log_output:
             log_output = "(log is empty)"
-        await ctx.send(f"Recent Log Snippet:`{log_output}`")
+        await ctx.send(f"Recent Error Log Snippet:\n```{log_output}```")
     except Exception as e:
         await ctx.send(f"❌ Could not read logs: {e}")
 
 if __name__ == "__main__":
     bot.run(DISCORD_BOT_TOKEN)
-
