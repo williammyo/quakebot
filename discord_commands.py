@@ -12,11 +12,28 @@ LAST_EVENT_FILE = "last_quake_text.txt"
 
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix="!", intents=intents)
+bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)  # Disable default help
 
 @bot.event
 async def on_ready():
     print(f"✅ Discord command bot connected as {bot.user}")
+
+@bot.event
+async def on_disconnect():
+    print("⚠️ Discord bot disconnected! Trying to reconnect...")
+
+@bot.command(name="help")
+async def help_command(ctx):
+    help_text = (
+        "📖 **Available Commands:**\n"
+        "`!status` - Check if QuakeBot is running and last check-in\n"
+        "`!restart` - Restart QuakeBot (systemd)\n"
+        "`!uptime` - Show EC2 instance uptime\n"
+        "`!lastquake` - Display last earthquake ID from logs\n"
+        "`!log` - Show last 20 lines of latest error log\n"
+        "`!help` - Display this message"
+    )
+    await ctx.send(help_text)
 
 @bot.command(name="status")
 async def status(ctx):
