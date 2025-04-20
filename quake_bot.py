@@ -202,6 +202,10 @@ def generate_map(lat, lon, output_file, mag=5.0, depth=10):
     except Exception as e:
         logger.error(f"Error generating shockwave map: {e}")
 
+def write_status(status: str):
+    with open("status.json", "w") as f:
+        json.dump({"status": status, "time": datetime.utcnow().isoformat()}, f)
+
 async def send_alert(bot, quake):
     lat = quake["lat"]
     lon = quake["lon"]
@@ -263,6 +267,8 @@ async def monitor_loop():
                 await asyncio.sleep(2)
         else:
             logger.info("No earthquake detected. Waiting for the next check....")
+
+        write_status("healthy")  # ✅ Update heartbeat
         await asyncio.sleep(CHECK_INTERVAL)
 
 if __name__ == '__main__':
