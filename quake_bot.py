@@ -172,6 +172,10 @@ def save_broadcasted_id(quake_id):
     with open("broadcasted_quakes.txt", "a", encoding="utf-8") as f:
         f.write(f"{quake_id}\n")
 
+def save_last_quake_id(quake_id):
+    with open("last_quake_text.txt", "w", encoding="utf-8") as f:
+        f.write(quake_id)
+
 def generate_map(lat, lon, output_file, mag=5.0, depth=10):
     api_key = os.getenv("GOOGLE_MAPS_API_KEY")
     zoom = 8
@@ -264,6 +268,7 @@ async def monitor_loop():
             for quake in new_quakes:
                 await send_alert(bot, quake)
                 save_broadcasted_id(quake["id"])
+                save_last_quake_id(quake["id"])
                 await asyncio.sleep(2)
         else:
             logger.info("No earthquake detected. Waiting for the next check....")
