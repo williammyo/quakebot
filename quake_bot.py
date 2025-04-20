@@ -14,10 +14,12 @@ from dotenv import load_dotenv
 from telegram import Bot
 from telegram.error import TelegramError
 from matplotlib import font_manager
+from matplotlib.patches import Rectangle
+import matplotlib.patheffects as path_effects
+from pytz import timezone, utc
 import math
 from fbPost import post_image_to_facebook
 from discord_logger import DiscordLogHandler
-from pytz import timezone
 import signal
 import traceback
 
@@ -156,7 +158,7 @@ def fetch_quakes_from_rss():
 
 def build_facebook_caption(fbemoji, mag, city_mm, distance_miles, mm_time, depth_km, lat, lon, link):
     return (
-        f"{fbemoji}{fbemoji}ငလျင်သတိပေးချက်{fbemoji}{fbemoji}\n\n" 
+        f"{fbemoji}ပြင်းအား{burmese_number(mag)}အဆင့်ရှိငလျင် {city_mm}အနီးလှုပ်ခတ်သွား\n\n"
         f"အင်အား : {burmese_number(mag)}\n"
         f"နေရာ : {city_mm}မှ {distance_miles}မိုင်ခန့်အကွာ\n"
         f"လှုတ်ခတ်ချိန် : {mm_time}\n"
@@ -164,6 +166,7 @@ def build_facebook_caption(fbemoji, mag, city_mm, distance_miles, mm_time, depth
         f"ဗဟိုမှတ်: Latitude {lat} | Longitude {lon}\n\n"
         f"ငလျင်သတင်းအရင်းအမြစ် ➤ {link}"
     )
+
 
 def load_broadcasted_ids():
     if not os.path.exists("broadcasted_quakes.txt"):
@@ -179,10 +182,24 @@ def save_last_quake_id(quake_id):
     with open("last_quake_text.txt", "w", encoding="utf-8") as f:
         f.write(quake_id)
 
-def generate_map(lat, lon, output_file, mag=5.0, depth=10):
+def generate_map(lat, lon, output_file, mag=5.0, depth=10, utc_time=""):
+    from matplotlib.patches import Rectangle
+    from pytz import timezone, utc
+    import matplotlib.patheffects as path_effects
+
     api_key = os.getenv("GOOGLE_MAPS_API_KEY")
-    zoom = 8
     size = 600
+
+    # 🔁 Dynamic Zoom based on magnitude & depth
+    if mag >= 6.5:
+        zoom = 6
+    elif mag >= 5.5:
+        zoom = 7
+    elif mag >= 4.5:
+        zoom = 8
+    else:
+        zoom = 9 if depth < 30 else 10
+
     map_url = "https://maps.googleapis.com/maps/api/staticmap"
     params = {
         "center": f"{lat},{lon}",
@@ -196,18 +213,64 @@ def generate_map(lat, lon, output_file, mag=5.0, depth=10):
     try:
         response = requests.get(map_url, params=params)
         map_image = Image.open(BytesIO(response.content))
+
+        # 🕒 Convert UTC to Myanmar Time
+        try:
+            dt_utc = datetime.strptime(utc_time.replace("UTC", "").strip(), "%Y-%m-%d %H:%M:%S")
+            dt_utc = utc.localize(dt_utc)
+            dt_mm = dt_utc.astimezone(timezone("Asia/Yangon"))
+        except Exception:
+            dt_mm = datetime.utcnow().replace(tzinfo=utc).astimezone(timezone("Asia/Yangon"))
+
+        time_str = dt_mm.strftime("%I:%M %p").upper()
+        date_str = dt_mm.strftime("%d/%m/%Y").upper()
+
+        emoji = "⚠️" if mag < 3.9 else "🚨"
+        mag_str = f"{emoji}{mag:.1f} MAGNITUDE{emoji}"
+        footer = "Telegram channel - https://t.me/myanmar_earthquake_alert"
+
         fig, ax = plt.subplots(figsize=(6, 6), dpi=100)
         ax.imshow(map_image)
         ax.axis('off')
+
+        # 🔴 Shockwave
         ax.plot(size, size, 'o', color='red', markersize=8)
-        for i, r in enumerate([40, 80, 120, 160]):
-            ax.add_patch(Circle((size, size), r, edgecolor='red', fill=False, linewidth=2, alpha=0.4 - i*0.1))
+        base_radius = int(mag * 20 + depth * 0.5)
+        for i, r in enumerate([base_radius, base_radius + 40, base_radius + 80, base_radius + 120]):
+            ax.add_patch(Circle((size, size), r, edgecolor='red', fill=False, linewidth=2, alpha=0.4 - i * 0.1))
+
+        # 🧾 Text overlays
+        ax.text(size, 30, mag_str, fontsize=18, fontweight='bold', color='red',
+                ha='center', va='top').set_path_effects([
+            path_effects.Stroke(linewidth=2, foreground='black'),
+            path_effects.Normal()
+        ])
+        ax.text(size, 60, time_str, fontsize=13, fontweight='bold', color='black',
+                ha='center', va='top').set_path_effects([
+            path_effects.Stroke(linewidth=2, foreground='white'),
+            path_effects.Normal()
+        ])
+        ax.text(size, 85, date_str, fontsize=13, fontweight='bold', color='black',
+                ha='center', va='top').set_path_effects([
+            path_effects.Stroke(linewidth=2, foreground='white'),
+            path_effects.Normal()
+        ])
+
+        # 🔵 Telegram Footer (Block with Telegram blue)
+        ax.add_patch(Rectangle(
+            (0, 0.95), 1, 0.05, transform=ax.transAxes,
+            color="#24A1DE", zorder=2
+        ))
+        ax.text(0.5, 0.975, footer, fontsize=9, fontweight='bold', color='white',
+                ha='center', va='center', transform=ax.transAxes, zorder=3)
+
         plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
         plt.savefig(output_file, format='png', dpi=100, bbox_inches='tight', pad_inches=0)
         plt.close()
-        logger.info("Earthquake Detected! Generating alert and shockwave map....")
+        logger.info("✅ Map rendered with overlays and footer.")
     except Exception as e:
         logger.error(f"Error generating shockwave map: {e}")
+
 
 def write_status(status: str):
     with open("status.json", "w") as f:
