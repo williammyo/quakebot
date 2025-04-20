@@ -3,6 +3,9 @@ import json
 import time
 import requests
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
+
+load_dotenv()
 
 STATUS_FILE = "status.json"
 DISCORD_WEBHOOK = os.getenv("DISCORD_LOG_WEBHOOK")  # use same webhook
