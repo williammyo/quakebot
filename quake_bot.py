@@ -2,7 +2,6 @@ import os
 import json
 import logging
 import asyncio
-import nest_asyncio
 import requests
 import urllib3
 import feedparser
@@ -18,9 +17,10 @@ from matplotlib import font_manager
 import math
 from fbPost import post_image_to_facebook
 from pytz import timezone
+import signal
+import traceback
 
 # ============ Setup ============ #
-nest_asyncio.apply()
 load_dotenv()
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logging.basicConfig(level=logging.INFO)
@@ -99,14 +99,14 @@ def fetch_quakes_from_rss():
     broadcasted_ids = load_broadcasted_ids()
     new_quakes = []
 
-    pacific = timezone('US/Pacific')  # For Pacific Time logging
+    pacific = timezone('US/Pacific')
 
     for entry in feed.entries:
         try:
             title = entry.title
             quake_id = entry.link.split("earthquake=")[-1]
             if quake_id in broadcasted_ids:
-                continue  # already alerted
+                continue
 
             lat = float(entry.get("geo_lat", 0.0))
             lon = float(entry.get("geo_long", 0.0))
@@ -115,23 +115,17 @@ def fetch_quakes_from_rss():
             utc_time = entry.get("tmd_time", "")
             link = entry.link
 
-            # Ignore quakes smaller than 2.0
             if mag < 2.0:
-                pacific_time = datetime.now(pacific).strftime("%m-%d-%Y %H:%M:%S %p")
-                logger.info(f"🟢 Magnitude {mag} earthquake ignored. ({pacific_time} PT)")
+                logger.info(f"🟢 Magnitude {mag} earthquake ignored. ({datetime.now(pacific)})")
                 continue
 
             is_myanmar = "เมียนมา" in title or "Myanmar" in title
 
-            # Only include non-Myanmar quakes if >= 3.0
             if not is_myanmar and mag < 3.0:
-                pacific_time = datetime.now(pacific).strftime("%m-%d-%Y %H:%M:%S %p")
-                logger.info(f"🟢 Small quake outside Myanmar ignored.({pacific_time} PT)")
+                logger.info(f"🟢 Small quake outside Myanmar ignored. ({datetime.now(pacific)})")
                 continue
 
-            # Logger for quakes that will trigger an alert
-            pacific_time = datetime.now(pacific).strftime("%m-%d-%Y %H:%M:%S %p")
-            logger.info(f"🔔 Magnitude {mag} earthquake detected. ({pacific_time} PT). Initiating Alerts across platforms.")
+            logger.info(f"🔔 Magnitude {mag} earthquake detected. ({datetime.now(pacific)}) Initiating Alerts.")
 
             new_quakes.append({
                 "id": quake_id,
@@ -147,10 +141,7 @@ def fetch_quakes_from_rss():
             logger.warning(f"Error parsing RSS entry: {e}")
             continue
 
-    return list(reversed(new_quakes))  # older quakes first
-
-
-
+    return list(reversed(new_quakes))
 
 def build_facebook_caption(fbemoji, mag, city_mm, distance_miles, mm_time, depth_km, lat, lon, link):
     return (
@@ -218,14 +209,14 @@ async def send_alert(bot, quake):
     fbemoji = "🚨" if mag >= 4.0 else "⚠️"
 
     if mag >= 6.0:
-         emoji = "🔴🚨"
+        emoji = "🔴🚨"
     elif mag >= 5.0:
         emoji = "🟠⚠️"
     elif mag >= 4.0:
         emoji = "🟡"
     else:
         emoji = "🟢"
-    
+
     image_path = "quake_map.png"
     generate_map(lat, lon, image_path, mag, depth_km)
     if not os.path.exists(image_path):
@@ -266,13 +257,21 @@ async def monitor_loop():
             logger.info("No earthquake detected. Waiting for the next check....")
         await asyncio.sleep(CHECK_INTERVAL)
 
-
-
 if __name__ == '__main__':
-    try:
-        asyncio.run(monitor_loop())
-    except KeyboardInterrupt:
-        logger.info("Stopped.")
-    except Exception as e:
-        logger.critical(f"Unhandled exception in main loop: {e}")
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
 
+    def shutdown_handler(sig, frame):
+        logger.info("Shutdown signal received. Stopping bot...")
+        loop.stop()
+
+    signal.signal(signal.SIGTERM, shutdown_handler)
+    signal.signal(signal.SIGINT, shutdown_handler)
+
+    try:
+        loop.run_until_complete(monitor_loop())
+    except Exception as e:
+        error = traceback.format_exc()
+        logger.critical(f"Unhandled exception in monitor_loop: {error}")
+    finally:
+        loop.close()
