@@ -7,6 +7,7 @@ __pycache__/
 venv/
 *.pem
 venv/
+.venv/
 
 # Logs, temp files
 *.log
@@ -24,3 +25,4 @@ data/
 
 #remote command
 discord_commands.py
+main.py
