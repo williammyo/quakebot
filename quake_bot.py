@@ -295,5 +295,7 @@ if __name__ == '__main__':
     except Exception as e:
         error = traceback.format_exc()
         logger.critical(f"Unhandled exception in monitor_loop: {error}")
+        with open("latest_error.log", "w") as f:
+            f.write(error)
     finally:
         loop.close()

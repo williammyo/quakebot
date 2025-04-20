@@ -3,6 +3,7 @@ import logging
 import requests
 from dotenv import load_dotenv
 from discord_logger import DiscordLogHandler
+import traceback
 
 # Load environment variables
 load_dotenv()
@@ -58,8 +59,10 @@ def post_image_to_facebook(image_path, caption):
                 logger.error(f"Facebook API Error: {result}")
                 return None, None
     except Exception as e:
-        logger.error(f"Exception during Facebook upload: {e}")
-        return None, None
+        logger.error(f"Some Facebook error: {e}")
+        with open("latest_error.log", "w") as f:
+            f.write(traceback.format_exc())
+
 
 # ============ Example Call (for testing) ============ #
 if __name__ == "__main__":
