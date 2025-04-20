@@ -2,6 +2,7 @@ import os
 import logging
 import requests
 from dotenv import load_dotenv
+from discord_logger import DiscordLogHandler
 
 # Load environment variables
 load_dotenv()
@@ -13,6 +14,14 @@ FB_API_VERSION = "v18.0"
 FB_GRAPH_URL = f"https://graph.facebook.com/{FB_API_VERSION}/{FB_PAGE_ID}/photos"
 
 logger = logging.getLogger("FBPoster")
+logger.setLevel(logging.INFO)
+
+# ============ Discord Log Handler ============ #
+discord_handler = DiscordLogHandler()
+discord_handler.setLevel(logging.INFO)
+discord_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+discord_handler.setFormatter(discord_formatter)
+logger.addHandler(discord_handler)
 
 # ============ Facebook Poster ============ #
 def post_image_to_facebook(image_path, caption):
@@ -37,7 +46,7 @@ def post_image_to_facebook(image_path, caption):
             response = requests.post(FB_GRAPH_URL, files=files, data=data)
             result = response.json()
             if "id" in result:
-                full_id = result['id']  # e.g., "122100678062842956"
+                full_id = result['id']
                 logger.info(f"Succesfully alerted Facebook! PostID: {full_id}")
                 if "_" in full_id:
                     page_id, post_id = full_id.split("_")
