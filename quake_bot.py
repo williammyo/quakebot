@@ -16,6 +16,7 @@ from telegram.error import TelegramError
 from matplotlib import font_manager
 import math
 from fbPost import post_image_to_facebook
+from discord_logger import DiscordLogHandler
 from pytz import timezone
 import signal
 import traceback
@@ -25,6 +26,13 @@ load_dotenv()
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("QuakeBot")
+
+# ============ Discord Log Handler ============ #
+discord_handler = DiscordLogHandler()
+discord_handler.setLevel(logging.INFO)
+discord_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+discord_handler.setFormatter(discord_formatter)
+logger.addHandler(discord_handler)
 
 # ============ Config ============ #
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
