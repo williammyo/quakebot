@@ -183,14 +183,14 @@ def save_last_quake_id(quake_id):
         f.write(quake_id)
 
 def generate_map(lat, lon, output_file, mag=5.0, depth=10, utc_time=""):
-    from matplotlib.patches import Rectangle
+    from datetime import datetime
     from pytz import timezone, utc
     import matplotlib.patheffects as path_effects
 
     api_key = os.getenv("GOOGLE_MAPS_API_KEY")
     size = 600
 
-    # 🔁 Dynamic Zoom based on magnitude & depth
+    # 🔁 Dynamic Zoom logic
     if mag >= 6.5:
         zoom = 6
     elif mag >= 5.5:
@@ -214,12 +214,13 @@ def generate_map(lat, lon, output_file, mag=5.0, depth=10, utc_time=""):
         response = requests.get(map_url, params=params)
         map_image = Image.open(BytesIO(response.content))
 
-        # 🕒 Convert UTC to Myanmar Time
+        # ⏰ Convert to Myanmar Time (properly from UTC)
         try:
             dt_utc = datetime.strptime(utc_time.replace("UTC", "").strip(), "%Y-%m-%d %H:%M:%S")
             dt_utc = utc.localize(dt_utc)
             dt_mm = dt_utc.astimezone(timezone("Asia/Yangon"))
         except Exception:
+            logger.warning(f"Invalid UTC time format: '{utc_time}'. Using current UTC time.")
             dt_mm = datetime.utcnow().replace(tzinfo=utc).astimezone(timezone("Asia/Yangon"))
 
         time_str = dt_mm.strftime("%I:%M %p").upper()
@@ -233,41 +234,47 @@ def generate_map(lat, lon, output_file, mag=5.0, depth=10, utc_time=""):
         ax.imshow(map_image)
         ax.axis('off')
 
-        # 🔴 Shockwave
+        # 🔴 Dynamic Shockwave Rings
         ax.plot(size, size, 'o', color='red', markersize=8)
         base_radius = int(mag * 20 + depth * 0.5)
         for i, r in enumerate([base_radius, base_radius + 40, base_radius + 80, base_radius + 120]):
             ax.add_patch(Circle((size, size), r, edgecolor='red', fill=False, linewidth=2, alpha=0.4 - i * 0.1))
 
-        # 🧾 Text overlays
-        ax.text(size, 30, mag_str, fontsize=18, fontweight='bold', color='red',
-                ha='center', va='top').set_path_effects([
-            path_effects.Stroke(linewidth=2, foreground='black'),
-            path_effects.Normal()
-        ])
-        ax.text(size, 60, time_str, fontsize=13, fontweight='bold', color='black',
-                ha='center', va='top').set_path_effects([
-            path_effects.Stroke(linewidth=2, foreground='white'),
-            path_effects.Normal()
-        ])
-        ax.text(size, 85, date_str, fontsize=13, fontweight='bold', color='black',
-                ha='center', va='top').set_path_effects([
-            path_effects.Stroke(linewidth=2, foreground='white'),
-            path_effects.Normal()
-        ])
+        # 📍 Text Overlays with Path Effects
+        # Magnitude - Bold Red
+        t = ax.text(0.5, 0.08, mag_str, fontsize=18, fontweight='bold', color='red',
+                    ha='center', va='top', transform=ax.transAxes)
+        t.set_path_effects([path_effects.Stroke(linewidth=2, foreground='black'), path_effects.Normal()])
 
-        # 🔵 Telegram Footer (Block with Telegram blue)
+        # Time - Black w/ white outline
+        t = ax.text(0.5, 0.12, time_str, fontsize=13, fontweight='bold', color='black',
+                    ha='center', va='top', transform=ax.transAxes)
+        t.set_path_effects([path_effects.Stroke(linewidth=2, foreground='white'), path_effects.Normal()])
+
+        # Date - Black w/ white outline
+        t = ax.text(0.5, 0.16, date_str, fontsize=13, fontweight='bold', color='black',
+                    ha='center', va='top', transform=ax.transAxes)
+        t.set_path_effects([path_effects.Stroke(linewidth=2, foreground='white'), path_effects.Normal()])
+
+        # Footer - Telegram Blue with white outline
+        footer_text = "Telegram channel - https://t.me/myanmar_earthquake_alert"
+        footer_y = 0.96
+        footer_height = 0.04
+        # Add background rectangle (Telegram Blue)
         ax.add_patch(Rectangle(
-            (0, 0.95), 1, 0.05, transform=ax.transAxes,
-            color="#24A1DE", zorder=2
+            (0, footer_y - footer_height), 1, footer_height,  # (x, y), width, height
+            transform=ax.transAxes,
+            color="red",
+            zorder=2
         ))
-        ax.text(0.5, 0.975, footer, fontsize=9, fontweight='bold', color='white',
-                ha='center', va='center', transform=ax.transAxes, zorder=3)
+        # Add white text over it
+        t = ax.text(0.5, footer_y - 0.01, footer_text, fontsize=9, fontweight='bold', color='white',
+            ha='center', va='top', transform=ax.transAxes, zorder=3)
 
         plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
         plt.savefig(output_file, format='png', dpi=100, bbox_inches='tight', pad_inches=0)
         plt.close()
-        logger.info("✅ Map rendered with overlays and footer.")
+        logger.info("✅ Map rendered with corrected timezone and improved footer style.")
     except Exception as e:
         logger.error(f"Error generating shockwave map: {e}")
 
