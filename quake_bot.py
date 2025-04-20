@@ -300,7 +300,7 @@ async def send_alert(bot, quake):
         emoji = "🟢"
 
     image_path = "quake_map.png"
-    generate_map(lat, lon, image_path, mag, depth_km)
+    generate_map(lat, lon, image_path, mag, depth_km, utc_time)
     if not os.path.exists(image_path):
         logger.error("Generated map is missing.")
         return
