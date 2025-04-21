@@ -189,18 +189,6 @@ def generate_map(lat, lon, output_file, mag=5.0, depth=10, utc_time=""):
     import matplotlib.patheffects as path_effects
     from matplotlib.patches import Rectangle
 
-    def generate_map(lat, lon, output_file, mag=5.0, depth=10, utc_time=""):
-    from datetime import datetime
-    from pytz import timezone, utc
-    import matplotlib.patheffects as path_effects
-    from matplotlib.patches import Rectangle, Circle
-    from io import BytesIO
-    from PIL import Image
-    import requests
-    import matplotlib.pyplot as plt
-    import os
-    import logging
-
     api_key = os.getenv("GOOGLE_MAPS_API_KEY")
     size = 600
     # Dynamic zoom logic
