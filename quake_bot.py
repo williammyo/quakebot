@@ -164,7 +164,8 @@ def build_facebook_caption(fbemoji, mag, city_mm, distance_miles, mm_time, depth
         f"လှုတ်ခတ်ချိန် : {mm_time}\n"
         f"အနက် : {burmese_number(depth_km)} ကီလိုမီတာ\n"
         f"ဗဟိုမှတ်: Latitude {lat} | Longitude {lon}\n\n"
-        f"ငလျင်သတင်းအရင်းအမြစ် ➤ {link}"
+        f"ငလျင်သတင်းအရင်းအမြစ် ➤ https://t.me/myanmar_earthquake_alert"
+       # f"ငလျင်သတင်းအရင်းအမြစ် ➤ {link}"
     )
 
 
