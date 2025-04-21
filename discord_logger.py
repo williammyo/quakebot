@@ -15,6 +15,7 @@ class DiscordLogHandler(logging.Handler):
         if (
             "No earthquake detected" in log_entry
             or "earthquake ignored" in log_entry
+            or "Small quake outside Myanmar ignored" in log_entry
         ):
             return
         
