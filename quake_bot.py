@@ -189,9 +189,20 @@ def generate_map(lat, lon, output_file, mag=5.0, depth=10, utc_time=""):
     import matplotlib.patheffects as path_effects
     from matplotlib.patches import Rectangle
 
+    def generate_map(lat, lon, output_file, mag=5.0, depth=10, utc_time=""):
+    from datetime import datetime
+    from pytz import timezone, utc
+    import matplotlib.patheffects as path_effects
+    from matplotlib.patches import Rectangle, Circle
+    from io import BytesIO
+    from PIL import Image
+    import requests
+    import matplotlib.pyplot as plt
+    import os
+    import logging
+
     api_key = os.getenv("GOOGLE_MAPS_API_KEY")
     size = 600
-
     # Dynamic zoom logic
     if mag >= 6.5:
         zoom = 6
@@ -201,7 +212,6 @@ def generate_map(lat, lon, output_file, mag=5.0, depth=10, utc_time=""):
         zoom = 8
     else:
         zoom = 9 if depth < 30 else 10
-
     map_url = "https://maps.googleapis.com/maps/api/staticmap"
     params = {
         "center": f"{lat},{lon}",
@@ -211,11 +221,9 @@ def generate_map(lat, lon, output_file, mag=5.0, depth=10, utc_time=""):
         "key": api_key,
         "scale": 2
     }
-
     try:
         response = requests.get(map_url, params=params)
         map_image = Image.open(BytesIO(response.content))
-
         # Convert UTC to Myanmar Time
         try:
             dt_utc = datetime.strptime(utc_time.replace("UTC", "").strip(), "%Y-%m-%d %H:%M:%S")
@@ -224,39 +232,37 @@ def generate_map(lat, lon, output_file, mag=5.0, depth=10, utc_time=""):
         except Exception:
             logger.warning(f"Invalid UTC time format: '{utc_time}'. Using current UTC time.")
             dt_mm = datetime.utcnow().replace(tzinfo=utc).astimezone(timezone("Asia/Yangon"))
-
         time_str = dt_mm.strftime("%I:%M %p").upper()
         date_str = dt_mm.strftime("%d/%m/%Y").upper()
-
         emoji = "⚠️⚠️" if mag > 3.9 else " "
         mag_str = f"{emoji} {mag:.1f} MAGNITUDE {emoji}"
         footer = "Telegram channel - https://t.me/myanmar_earthquake_alert"
-
         fig, ax = plt.subplots(figsize=(6, 6), dpi=100)
         ax.imshow(map_image)
         ax.axis('off')
-
         # Shockwave circles
         ax.plot(size, size, 'o', color='red', markersize=8)
         base_radius = int(mag * 20 + depth * 0.5)
         for i, r in enumerate([base_radius, base_radius + 40, base_radius + 80, base_radius + 120]):
             ax.add_patch(Circle((size, size), r, edgecolor='red', fill=False, linewidth=2, alpha=0.4 - i * 0.1))
-
+            
+        # Add earthquake alert header - positioned above the magnitude
+        t = ax.text(0.5, 0.92, "EARTHQUAKE ALERT!", fontsize=25, fontweight='bold', color='red',
+                    ha='center', va='center', transform=ax.transAxes, zorder=3)
+        t.set_path_effects([path_effects.Stroke(linewidth=3, foreground='white'), path_effects.Normal()])
+            
         # Date - positioned lowest of the three texts
         t = ax.text(0.5, 0.10, date_str, fontsize=12, fontweight='bold', color='black',
                 ha='center', va='center', transform=ax.transAxes)
         t.set_path_effects([path_effects.Stroke(linewidth=2, foreground='white'), path_effects.Normal()])
-
         # Time - positioned in the middle
         t = ax.text(0.5, 0.16, time_str, fontsize=12, fontweight='bold', color='black',
                 ha='center', va='center', transform=ax.transAxes)
         t.set_path_effects([path_effects.Stroke(linewidth=2, foreground='white'), path_effects.Normal()])
-
         # Magnitude - positioned at the top as requested
         t = ax.text(0.5, 0.24, mag_str, fontsize=23, fontweight='bold', color='red',
             ha='center', va='center', transform=ax.transAxes)
         t.set_path_effects([path_effects.Stroke(linewidth=2, foreground='black'), path_effects.Normal()])
-
         # Telegram footer (bottom bar) - keep this at the bottom
         ax.add_patch(Rectangle(
             (0, 0), 1, 0.04, transform=ax.transAxes,
@@ -264,14 +270,12 @@ def generate_map(lat, lon, output_file, mag=5.0, depth=10, utc_time=""):
         ))
         ax.text(0.5, 0.02, footer, fontsize=9, fontweight='bold', color='white',
             ha='center', va='center', transform=ax.transAxes, zorder=3)
-
         plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
         plt.savefig(output_file, format='png', dpi=100, bbox_inches='tight', pad_inches=0)
         plt.close()
         logger.info("✅ Map rendered with updated bottom-stacked layout.")
     except Exception as e:
         logger.error(f"Error generating shockwave map: {e}")
-
 
 
 def write_status(status: str):
