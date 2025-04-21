@@ -161,7 +161,7 @@ def build_facebook_caption(fbemoji, mag, city_mm, distance_miles, mm_time, depth
         f"{fbemoji}ပြင်းအား{burmese_number(mag)}အဆင့်ရှိငလျင် {city_mm}အနီးလှုပ်ခတ်သွား\n\n"
         f"အင်အား : {burmese_number(mag)}\n"
         f"နေရာ : {city_mm}မှ {distance_miles}မိုင်ခန့်အကွာ\n"
-        f"လှုတ်ခတ်ချိန် : {mm_time}\n"
+        f"လှုပ်ခတ်ချိန် : {mm_time}\n"
         f"အနက် : {burmese_number(depth_km)} ကီလိုမီတာ\n"
         f"ဗဟိုမှတ်: Latitude {lat} | Longitude {lon}\n\n"
         f"ငလျင်သတင်းအရင်းအမြစ် ➤ https://t.me/myanmar_earthquake_alert"
