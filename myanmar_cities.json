@@ -1,5 +1,4 @@
-{
-  "Kachin State": [
+[
     { "city": "Myitkyina", "city_mm": "မြစ်ကြီးနားမြို့", "lat": "25.3860", "lng": "97.3944" },
     { "city": "Hsinbo", "city_mm": "ဆင်ဘိုမြို့", "lat": "25.0500", "lng": "96.9500" },
     { "city": "Waingmaw", "city_mm": "ဝိုင်းမော်မြို့", "lat": "25.3833", "lng": "97.4333" },
@@ -32,9 +31,7 @@
     { "city": "Machanbaw", "city_mm": "မချမ်းဘောမြို့", "lat": "27.3167", "lng": "97.1333" },
     { "city": "Nogmung", "city_mm": "နောင်မွန်းမြို့", "lat": "27.5167", "lng": "96.8833" },
     { "city": "Pannandin", "city_mm": "ပန်နန်းဒင်မြို့", "lat": "27.8000", "lng": "97.2000" },
-    { "city": "Kawnglanghpu", "city_mm": "ခေါင်လန်ဖူးမြို့", "lat": "28.2833", "lng": "97.0333" }
-  ],
-  "Kayah State": [
+    { "city": "Kawnglanghpu", "city_mm": "ခေါင်လန်ဖူးမြို့", "lat": "28.2833", "lng": "97.0333" },
     { "city": "Loikaw", "city_mm": "လွိုင်ကော်မြို့", "lat": "19.6650", "lng": "97.2060" },
     { "city": "Loilen Lay", "city_mm": "လွိုင်လင်လေးမြို့", "lat": "19.5667", "lng": "97.2167" },
     { "city": "Demoso", "city_mm": "ဒီးမော့ဆိုမြို့", "lat": "19.6325", "lng": "97.2852" },
@@ -44,9 +41,7 @@
     { "city": "Bawlakhe", "city_mm": "ဘောလခဲမြို့", "lat": "18.9762", "lng": "97.0382" },
     { "city": "Ywathit", "city_mm": "ရွာသစ်မြို့", "lat": "18.8167", "lng": "97.1667" },
     { "city": "Hpasawng", "city_mm": "ဖားဆောင်းမြို့", "lat": "18.8233", "lng": "96.9844" },
-    { "city": "Mese", "city_mm": "မယ်စဲမြို့", "lat": "18.3050", "lng": "97.4850" }
-  ],
-  "Kayin State": [
+    { "city": "Mese", "city_mm": "မယ်စဲမြို့", "lat": "18.3050", "lng": "97.4850" },
     { "city": "Hpa-An", "city_mm": "ဘားအံမြို့", "lat": "16.8890", "lng": "97.6333" },
     { "city": "Hlaingbwe", "city_mm": "လှိုင်းဘွဲ့မြို့", "lat": "17.3311", "lng": "97.7667" },
     { "city": "Paingkyon", "city_mm": "ပိုင်ကျုံမြို့", "lat": "17.1167", "lng": "97.6833" },
@@ -64,9 +59,7 @@
     { "city": "Kyondoe", "city_mm": "ကျုံဒိုးမြို့", "lat": "16.7083", "lng": "98.2500" },
     { "city": "Kyainseikgyi", "city_mm": "ကြာအင်းဆိပ်ကြီးမြို့", "lat": "15.8790", "lng": "97.9430" },
     { "city": "Payathonzu", "city_mm": "ဘုရားသုံးဆူမြို့", "lat": "15.9990", "lng": "97.8978" },
-    { "city": "Kyaikdon", "city_mm": "ကျိုက်ဒုံမြို့", "lat": "16.0546", "lng": "98.2535" }
-  ],
-  "Chin State": [
+    { "city": "Kyaikdon", "city_mm": "ကျိုက်ဒုံမြို့", "lat": "16.0546", "lng": "98.2535" },
     { "city": "Falam", "city_mm": "ဖလမ်းမြို့", "lat": "22.9167", "lng": "93.6833" },
     { "city": "Rikhawdar", "city_mm": "ရိခေါ်ဒါရ်မြို့", "lat": "23.3667", "lng": "93.5000" },
     { "city": "Webula", "city_mm": "ဝေဘူလမြို့", "lat": "23.3333", "lng": "93.4333" },
@@ -86,9 +79,7 @@
     { "city": "Kanpetlet", "city_mm": "ကန်ပက်လက်မြို့", "lat": "21.1989", "lng": "93.9360" },
     { "city": "Kyin Dway", "city_mm": "ကျင်ဒွေးမြို့", "lat": "21.0500", "lng": "94.0500" },
     { "city": "Paletwa", "city_mm": "ပလက်ဝမြို့", "lat": "21.3280", "lng": "92.8542" },
-    { "city": "Samee", "city_mm": "ဆမီးမြို့", "lat": "21.6167", "lng": "93.0500" }
-  ],
-  "Sagaing Region": [
+    { "city": "Samee", "city_mm": "ဆမီးမြို့", "lat": "21.6167", "lng": "93.0500" },
     { "city": "Sagaing", "city_mm": "စစ်ကိုင်းမြို့", "lat": "21.8750", "lng": "95.9786" },
     { "city": "Sar Taung", "city_mm": "ဆားတောင်မြို့", "lat": "21.8000", "lng": "95.9333" },
     { "city": "Myinmu", "city_mm": "မြင်းမူမြို့", "lat": "21.9411", "lng": "95.5947" },
@@ -139,9 +130,7 @@
     { "city": "Htan Par Kway", "city_mm": "ထန်ပါခွေမြို့", "lat": "25.7500", "lng": "94.5500" },
     { "city": "Nanyun", "city_mm": "နန်းယွန်းမြို့", "lat": "25.6621", "lng": "96.2016" },
     { "city": "Pansaung", "city_mm": "ပန်ဆောင်မြို့", "lat": "25.2933", "lng": "96.8858" },
-    { "city": "Donhee", "city_mm": "ဒုံဟီးမြို့", "lat": "25.1466", "lng": "96.5747" }
-  ],
-  "Tanintharyi Region": [
+    { "city": "Donhee", "city_mm": "ဒုံဟီးမြို့", "lat": "25.1466", "lng": "96.5747" },
     { "city": "Dawei", "city_mm": "ထားဝယ်မြို့", "lat": "14.0820", "lng": "98.1919" },
     { "city": "Myitta", "city_mm": "မေတ္တာမြို့", "lat": "14.2333", "lng": "98.5000" },
     { "city": "Launglon", "city_mm": "လောင်းလုံးမြို့", "lat": "14.0059", "lng": "98.2040" },
@@ -159,9 +148,7 @@
     { "city": "Khamaukgyi", "city_mm": "ခမောက်ကြီးမြို့", "lat": "11.1500", "lng": "99.1500" },
     { "city": "Bokpyin", "city_mm": "ဘုတ်ပြင်းမြို့", "lat": "11.2308", "lng": "98.7092" },
     { "city": "Pyigyimandaing", "city_mm": "ပြည်ကြီးမဏ္ဍိုင်မြို့", "lat": "11.6958", "lng": "98.5333" },
-    { "city": "Karathuri", "city_mm": "ကရသူရိမြို့", "lat": "11.2333", "lng": "98.6167" }
-  ],
-  "Bago Region": [
+    { "city": "Karathuri", "city_mm": "ကရသူရိမြို့", "lat": "11.2333", "lng": "98.6167" },
     { "city": "Bago", "city_mm": "ပဲခူးမြို့", "lat": "17.3352", "lng": "96.4814" },
     { "city": "Hpayargyi", "city_mm": "ဘုရားကြီးမြို့", "lat": "17.2667", "lng": "96.5833" },
     { "city": "Inntakaw", "city_mm": "အင်းတကော်မြို့", "lat": "17.5375", "lng": "96.4367" },
@@ -212,9 +199,7 @@
     { "city": "Nattalin", "city_mm": "နတ်တလင်းမြို့", "lat": "18.3775", "lng": "95.9160" },
     { "city": "Tarpun", "city_mm": "တာပွန်မြို့", "lat": "18.1717", "lng": "95.8630" },
     { "city": "Monyo", "city_mm": "မိုးညိုမြို့", "lat": "18.0986", "lng": "95.6775" },
-    { "city": "Gyobingauk", "city_mm": "ကြို့ပင်ကောက်မြို့", "lat": "18.2686", "lng": "95.6594" }
-  ],
-  "Magway Region": [
+    { "city": "Gyobingauk", "city_mm": "ကြို့ပင်ကောက်မြို့", "lat": "18.2686", "lng": "95.6594" },
     { "city": "Magway", "city_mm": "မကွေးမြို့", "lat": "20.1445", "lng": "94.9196" },
     { "city": "Yenangyaung", "city_mm": "ရေနံချောင်းမြို့", "lat": "20.4613", "lng": "94.8714" },
     { "city": "Chauk", "city_mm": "ချောက်မြို့", "lat": "20.8951", "lng": "94.8200" },
@@ -246,9 +231,7 @@
     { "city": "Kyaw", "city_mm": "ကျောမြို့", "lat": "21.9880", "lng": "94.4340" },
     { "city": "Tilin", "city_mm": "ထီးလင်းမြို့", "lat": "21.8081", "lng": "94.4738" },
     { "city": "Saw", "city_mm": "ဆောမြို့", "lat": "21.7290", "lng": "94.4427" },
-    { "city": "Kyaukhtu", "city_mm": "ကျောက်ထုမြို့", "lat": "21.6282", "lng": "94.1026" }
-  ],
-  "Mandalay Region": [
+    { "city": "Kyaukhtu", "city_mm": "ကျောက်ထုမြို့", "lat": "21.6282", "lng": "94.1026" },
     { "city": "Mandalay", "city_mm": "မန္တလေးမြို့", "lat": "21.9751", "lng": "96.0844" },
     { "city": "Aungmyaythazan", "city_mm": "အောင်မြေသာဇံမြို့", "lat": "21.9912", "lng": "96.0988" },
     { "city": "Chanayethazan", "city_mm": "ချမ်းအေးသာဇံမြို့", "lat": "21.9728", "lng": "96.0963" },
@@ -283,9 +266,7 @@
     { "city": "Meiktila", "city_mm": "မိတ္ထီလာမြို့", "lat": "20.8778", "lng": "95.8586" },
     { "city": "Mahlaing", "city_mm": "မလှိုင်မြို့", "lat": "20.6881", "lng": "95.5277" },
     { "city": "Thazi", "city_mm": "သာစည်မြို့", "lat": "20.8789", "lng": "96.0419" },
-    { "city": "Wundwin", "city_mm": "ဝမ်းတွင်းမြို့", "lat": "20.8300", "lng": "96.1800" }
-  ],
-  "Mon State": [
+    { "city": "Wundwin", "city_mm": "ဝမ်းတွင်းမြို့", "lat": "20.8300", "lng": "96.1800" },
     { "city": "Mawlamyine", "city_mm": "မော်လမြိုင်မြို့", "lat": "16.4905", "lng": "97.6283" },
     { "city": "Kyaikmaraw", "city_mm": "ကျိုက်မရောမြို့", "lat": "16.5539", "lng": "97.7279" },
     { "city": "Chaungzon", "city_mm": "ချောင်းဆုံမြို့", "lat": "16.5547", "lng": "97.6125" },
@@ -302,9 +283,7 @@
     { "city": "Zinkyaik", "city_mm": "ဇင်းကျိုက်မြို့", "lat": "16.7200", "lng": "97.4200" },
     { "city": "Kyaikto", "city_mm": "ကျိုက်ထိုမြို့", "lat": "17.3072", "lng": "97.0105" },
     { "city": "Theinzayat", "city_mm": "သိမ်ဇရပ်မြို့", "lat": "16.6644", "lng": "97.3586" },
-    { "city": "Bilin", "city_mm": "ဘီးလင်းမြို့", "lat": "17.1648", "lng": "97.0840" }
-  ],
-  "Rakhine State": [
+    { "city": "Bilin", "city_mm": "ဘီးလင်းမြို့", "lat": "17.1648", "lng": "97.0840" },
     { "city": "Sittwe", "city_mm": "စစ်တွေမြို့", "lat": "20.1462", "lng": "92.8963" },
     { "city": "Ponnagyun", "city_mm": "ပုဏ္ဏားကျွန်းမြို့", "lat": "20.5936", "lng": "92.7050" },
     { "city": "Mrauk-U", "city_mm": "မြောက်ဦးမြို့", "lat": "20.5936", "lng": "93.1925" },
@@ -329,9 +308,7 @@
     { "city": "Ma-Ei", "city_mm": "မအီမြို့", "lat": "18.5363", "lng": "94.3177" },
     { "city": "Tanlwe", "city_mm": "တန်းလွဲရွာမမြို့", "lat": "18.5000", "lng": "94.3833" },
     { "city": "Gwa", "city_mm": "ဂွမြို့", "lat": "17.6033", "lng": "94.5924" },
-    { "city": "Kyeintali", "city_mm": "ကျိန္တလီမြို့", "lat": "17.5115", "lng": "94.3351" }
-  ],
-  "Yangon Region": [
+    { "city": "Kyeintali", "city_mm": "ကျိန္တလီမြို့", "lat": "17.5115", "lng": "94.3351" },
     { "city": "Yangon", "city_mm": "ရန်ကုန်မြို့", "lat": "16.8661", "lng": "96.1951" },
     { "city": "Insein", "city_mm": "အင်းစိန်မြို့", "lat": "16.8928", "lng": "96.0981" },
     { "city": "Mingaladon", "city_mm": "မင်္ဂလာဒုံမြို့", "lat": "16.9187", "lng": "96.1370" },
@@ -383,9 +360,7 @@
     { "city": "Bahan", "city_mm": "ဗဟန်းမြို့", "lat": "16.8072", "lng": "96.1658" },
     { "city": "Seikkan", "city_mm": "ဆိပ်ကမ်းမြို့", "lat": "16.7667", "lng": "96.2000" },
     { "city": "Hlaingthaya (East)", "city_mm": "လှိုင်သာယာ (အရှေ့ပိုင်း) မြို့", "lat": "16.8960", "lng": "96.0220" },
-    { "city": "Hlaingthaya (West)", "city_mm": "လှိုင်သာယာ (အနောက်ပိုင်း) မြို့", "lat": "16.9020", "lng": "96.0050" }
-  ],
-  "Shan State": [
+    { "city": "Hlaingthaya (West)", "city_mm": "လှိုင်သာယာ (အနောက်ပိုင်း) မြို့", "lat": "16.9020", "lng": "96.0050" },
     { "city": "Taunggyi", "city_mm": "တောင်ကြီးမြို့", "lat": "20.7892", "lng": "97.0378" },
     { "city": "Ayetharyar", "city_mm": "အေးသာယာမြို့", "lat": "20.7278", "lng": "97.0481" },
     { "city": "Kyauktalon (Nyaungshwe)", "city_mm": "ကျောက်တလုံးကြီးမြို့", "lat": "20.9000", "lng": "96.9167" },
@@ -471,9 +446,7 @@
     { "city": "Yin Pang", "city_mm": "ရင်ဖန့်မြို့", "lat": "22.8833", "lng": "99.8000" },
     { "city": "Man Man Hseng", "city_mm": "မန်မန်ဆိုင်မြို့", "lat": "22.6000", "lng": "99.7667" },
     { "city": "Nawnghkio (Wa)", "city_mm": "နောင်ခစ်မြို့", "lat": "22.5000", "lng": "99.9167" },
-    { "city": "Wein Kao", "city_mm": "ဝိန်းကောင်မြို့", "lat": "22.4000", "lng": "99.7500" }
-  ],
-  "Ayeyarwady Region": [
+    { "city": "Wein Kao", "city_mm": "ဝိန်းကောင်မြို့", "lat": "22.4000", "lng": "99.7500" },
     { "city": "Pathein", "city_mm": "ပုသိမ်မြို့", "lat": "16.7675", "lng": "94.7287" },
     { "city": "Shwethaungyan", "city_mm": "ရွှေသောင်ယံမြို့", "lat": "16.9333", "lng": "94.5333" },
     { "city": "Ngwesaung", "city_mm": "ငွေဆောင်မြို့", "lat": "16.8620", "lng": "94.4651" },
@@ -518,9 +491,7 @@
     { "city": "Ahmar", "city_mm": "အမာမြို့", "lat": "16.1522", "lng": "95.2010" },
     { "city": "Bogale", "city_mm": "ဘိုကလေးမြို့", "lat": "16.0527", "lng": "95.3673" },
     { "city": "Kyaiklat", "city_mm": "ကျိုက်လတ်မြို့", "lat": "16.4437", "lng": "95.7236" },
-    { "city": "Dedaye", "city_mm": "ဒေးဒရဲမြို့", "lat": "16.5559", "lng": "95.2183" }
-  ],
-  "Naypyidaw Union Territory": [
+    { "city": "Dedaye", "city_mm": "ဒေးဒရဲမြို့", "lat": "16.5559", "lng": "95.2183" },
     { "city": "Nay Pyi Taw", "city_mm": "နေပြည်တော်မြို့", "lat": "19.7636", "lng": "96.0785" },
     { "city": "Zeyar Thiri", "city_mm": "ဇေယျာသီရိမြို့", "lat": "19.8248", "lng": "96.2325" },
     { "city": "Zabuthiri", "city_mm": "ဇမ္ဗူသီရိမြို့", "lat": "19.7481", "lng": "96.1483" },
@@ -531,4 +502,4 @@
     { "city": "Lewe", "city_mm": "လယ်ဝေးမြို့", "lat": "19.6733", "lng": "96.1172" },
     { "city": "Ottarathiri", "city_mm": "ဥတ္တရသီရိမြို့", "lat": "19.8097", "lng": "96.2561" }
   ]
-}
+
