@@ -1,3 +1,10 @@
+# ================================ #
+#       Myanmar Quake Bot v1.0     #
+#       Author: William            #
+#       Description: Telegram +    #
+#       Facebook Earthquake Bot    #
+# ================================ #
+
 import os
 import json
 import logging
@@ -23,20 +30,19 @@ from discord_logger import DiscordLogHandler
 import signal
 import traceback
 
-# ============ Setup ============ #
+# ============ Setup & Logging ============ #
 load_dotenv()
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("QuakeBot")
-
-# ============ Discord Log Handler ============ #
+#Discord Log Handling(Optional)
 discord_handler = DiscordLogHandler()
 discord_handler.setLevel(logging.INFO)
 discord_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 discord_handler.setFormatter(discord_formatter)
 logger.addHandler(discord_handler)
 
-# ============ Config ============ #
+# ============ Configurations ============ #
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHANNEL_ID = os.getenv("TELEGRAM_CHANNEL_ID")
 CITIES_JSON = "myanmar_cities.json"
@@ -45,12 +51,11 @@ LAST_EVENT_FILE = "last_quake_text.txt"
 FONT = font_manager.FontProperties(family="Arial Unicode MS") 
 BURMESE_DIGITS = "၀၁၂၃၄၅၆၇၈၉"
 
+# ============ Utility Functions ============ #
 def get_pacific_time_str():
     pacific = timezone('US/Pacific')
     return datetime.now(pacific).strftime("%H:%M")
-
-
-# ============ Load City JSON ============ #
+#Load City Json
 with open(CITIES_JSON, 'r', encoding='utf-8') as f:
     CITY_DATA = json.load(f)
 
@@ -109,6 +114,7 @@ def convert_utc_to_myanmar(utc_str):
     logger.error(f"Could not parse UTC time string: {utc_str}")
     return None
 
+# ============ Fetch & Filter Quakes ============ #
 def fetch_quakes_from_rss():
     feed = feedparser.parse("https://earthquake.tmd.go.th/feed/rss_tmd.xml")
     broadcasted_ids = load_broadcasted_ids()
@@ -169,7 +175,7 @@ def build_facebook_caption(fbemoji, mag, city_mm, distance_miles, mm_time, depth
         f"မြေပုံအသေးစိပ်ကြည့်ရှရန် : https://www.google.com/maps?q={lat},{lon}"
     )
 
-
+# ============ Broadcasted ID File Helpers ============ #
 def load_broadcasted_ids():
     if not os.path.exists("broadcasted_quakes.txt"):
         return set()
@@ -299,7 +305,7 @@ async def send_alert(bot, quake):
     if not os.path.exists(image_path):
         logger.error("Generated map is missing.")
         return
-
+    #Post to Facebook
     fb_caption = build_facebook_caption(fbemoji, mag, city_mm, distance_miles, mm_time, depth_km, lat, lon, link)
     page_id, post_id = post_image_to_facebook(image_path, fb_caption)
     if not page_id or not post_id:
@@ -307,6 +313,10 @@ async def send_alert(bot, quake):
         return
     fb_post_url = f"https://www.facebook.com/{page_id}/posts/{post_id}"
 
+    if mag < 3.0:
+        logger.info(f"Skipped Telegram due to magnitude{mag} < 3.0.")
+        return
+    #Post to Telegram if magnitude > 3.0
     telegram_caption = (
         f"{emoji} အင်အား {burmese_number(mag)} အဆင့်\n"
         f"📍 {city_mm}မှ {distance_miles} မိုင်ခန့်အကွာ\n"
