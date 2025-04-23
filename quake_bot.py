@@ -118,6 +118,7 @@ def convert_utc_to_myanmar(utc_str):
 def fetch_quakes_from_rss():
     feed = feedparser.parse("https://earthquake.tmd.go.th/feed/rss_tmd.xml")
     broadcasted_ids = load_broadcasted_ids()
+    ignored_ids = load_ignored_quake_ids()
     new_quakes = []
 
     for entry in feed.entries:
@@ -135,13 +136,17 @@ def fetch_quakes_from_rss():
             link = entry.link
 
             if mag < 2.0:
-                logger.info(f"🟢 Magnitude {mag} earthquake ignored. ({get_pacific_time_str()} PT)")
+                if quake_id not in ignored_ids:
+                    save_ignored_quake_id(quake_id)
+                    logger.info(f"🟢 Magnitude {mag} earthquake ignored. ({get_pacific_time_str()} PT)")
                 continue
 
             is_myanmar = "เมียนมา" in title or "Myanmar" in title
 
             if not is_myanmar and mag < 3.0:
-                logger.info(f"🟢 Small quake outside Myanmar ignored. ({get_pacific_time_str()} PT)")
+                if quake_id not in ignored_ids:
+                    save_ignored_quake_id(quake_id)
+                    logger.info(f"🟢 Small quake outside Myanmar ignored. ({get_pacific_time_str()} PT)")
                 continue
 
             logger.info(f"🔔 Magnitude {mag} earthquake detected at ({get_pacific_time_str()} PT).Initiating Alerts.")
@@ -170,7 +175,6 @@ def build_facebook_caption(fbemoji, mag, city_mm, distance_miles, mm_time, depth
         f"နေရာ : {city_mm}မှ {distance_miles}မိုင်ခန့်အကွာ\n"
         f"လှုပ်ခတ်ချိန် : {mm_time}\n"
         f"အနက် : {burmese_number(depth_km)} ကီလိုမီတာ\n"
-        f"အနက် : {burmese_number(depth_km)} ကီလိုမီတာ\n"
         f"ဗဟိုမှတ်: Latitude {lat} | Longitude {lon}\n"
         f"မြေပုံအသေးစိပ်ကြည့်ရှရန် : https://www.google.com/maps?q={lat},{lon}"
     )
@@ -189,6 +193,16 @@ def save_broadcasted_id(quake_id):
 def save_last_quake_id(quake_id):
     with open("last_quake_text.txt", "w", encoding="utf-8") as f:
         f.write(quake_id)
+
+def save_ignored_quake_id(quake_id):
+    with open("ignored_quakes.txt", "a", encoding="utf-8") as f:
+        f.write(f"{quake_id}\n")
+
+def load_ignored_quake_ids():
+    if not os.path.exists("ignored_quakes.txt"):
+        return set()
+    with open("ignored_quakes.txt", "r", encoding="utf-8") as f:
+        return set(line.strip() for line in f.readlines())
 
 def generate_map(lat, lon, output_file, mag=5.0, depth=10, utc_time=""):
     from datetime import datetime
@@ -314,7 +328,7 @@ async def send_alert(bot, quake):
     fb_post_url = f"https://www.facebook.com/{page_id}/posts/{post_id}"
 
     if mag < 3.0:
-        logger.info(f"Skipped Telegram due to magnitude{mag} < 3.0.")
+        logger.info(f"Skipped Telegram due to magnitude {mag} < 3.0.")
         return
     #Post to Telegram if magnitude > 3.0
     telegram_caption = (
