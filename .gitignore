@@ -12,11 +12,13 @@ venv/
 # Logs, temp files
 *.log
 *.png
+status.json
 
 # Earthquake state tracking
 chat_ids.txt
 last_*.txt
 broadcasted_quakes.txt
+ignored_quakes.txt
 data/
 
 # OS/Editor stuff
