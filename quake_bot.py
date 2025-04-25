@@ -138,7 +138,7 @@ def fetch_quakes_from_rss():
             if mag < 2.0:
                 if quake_id not in ignored_ids:
                     save_ignored_quake_id(quake_id)
-                    logger.info(f"🟢 Magnitude {mag} earthquake ignored. ({get_pacific_time_str()} PT)")
+                    logger.info(f"🟢 Magnitude {mag} earthquake ignored. ({get_pacific_time_str()})")
                 continue
 
             is_myanmar = "เมียนมา" in title or "Myanmar" in title
@@ -146,10 +146,10 @@ def fetch_quakes_from_rss():
             if not is_myanmar and mag < 3.0:
                 if quake_id not in ignored_ids:
                     save_ignored_quake_id(quake_id)
-                    logger.info(f"🟢 Small quake outside Myanmar ignored. ({get_pacific_time_str()} PT)")
+                    logger.info(f"🟢 Small quake outside Myanmar ignored. ({get_pacific_time_str()})")
                 continue
 
-            logger.info(f"🔔 Magnitude {mag} earthquake detected at ({get_pacific_time_str()} PT).Initiating Alerts.")
+            logger.info(f"🔔 Magnitude {mag} earthquake detected at ({get_pacific_time_str()}).Initiating Alerts.")
 
             new_quakes.append({
                 "id": quake_id,
@@ -282,7 +282,7 @@ def generate_map(lat, lon, output_file, mag=5.0, depth=10, utc_time=""):
         plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
         plt.savefig(output_file, format='png', dpi=100, bbox_inches='tight', pad_inches=0)
         plt.close()
-        logger.info("✅ Map rendered with updated bottom-stacked layout.")
+        logger.info("✅ Quake Map rendered Successfully.")
     except Exception as e:
         logger.error(f"Error generating shockwave map: {e}")
 
