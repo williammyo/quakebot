@@ -366,6 +366,7 @@ async def monitor_loop():
                     quake["lon"],
                     "Alerted"
                 )
+                logger.info(f"✅ Quake {quake['id']} saved. Proceeding to alert...")
                 await send_alert(bot, quake)
                 await asyncio.sleep(2)
         else:
@@ -373,6 +374,7 @@ async def monitor_loop():
 
         write_status("healthy")  # ✅ Update heartbeat
         await asyncio.sleep(CHECK_INTERVAL)
+
 
 if __name__ == '__main__':
     loop = asyncio.new_event_loop()
