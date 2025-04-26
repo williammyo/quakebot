@@ -357,7 +357,6 @@ async def monitor_loop():
         new_quakes = fetch_quakes_from_rss()
         if new_quakes:
             for quake in new_quakes:
-                await send_alert(bot, quake)
                 save_quake_to_dynamodb(
                     quake["id"],
                     quake["mag"],
@@ -367,6 +366,7 @@ async def monitor_loop():
                     quake["lon"],
                     "Alerted"
                 )
+		await send_alert(bot, quake)
                 await asyncio.sleep(2)
         else:
             logger.info("No earthquake detected. Waiting for the next check....")
