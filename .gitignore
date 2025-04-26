@@ -8,6 +8,8 @@ venv/
 *.pem
 venv/
 .venv/
+*.sh
+*.txt
 
 # Logs, temp files
 *.log
