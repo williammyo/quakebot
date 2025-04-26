@@ -38,34 +38,36 @@ def parse_utc_datetime(utc_str):
 
 def save_quake_to_dynamodb(quake_id, magnitude, utc_datetime_str, depth, lat, lon, status):
     dt_utc = parse_utc_datetime(utc_datetime_str)
+
     if dt_utc is None:
-        logger.error(f"❌ Skipping save for quake {quake_id}: Invalid UTC time format")
+        logger.error(f"❌ Skipping save for quake {quake_id}: Could not parse UTC time '{utc_datetime_str}'")
         return False
 
-    mm_time = (dt_utc + timedelta(hours=6, minutes=30)).strftime("%Y-%m-%dT%H:%M:%S")
     try:
+        mm_datetime = (dt_utc + timedelta(hours=6, minutes=30)).strftime("%Y-%m-%dT%H:%M:%S")
+
         table.put_item(
             Item={
-                "quake_id": quake_id,
-                "magnitude": Decimal(str(magnitude)),
-                "utc_time": dt_utc.strftime("%Y-%m-%dT%H:%M:%S"),
-                "mm_time": mm_time,
-                "depth": Decimal(str(depth)),
-                "latitude": Decimal(str(lat)),
-                "longitude": Decimal(str(lon)),
-                "status": status,
+                'quake_id': quake_id,
+                'magnitude': Decimal(str(magnitude)),
+                'utc_time': dt_utc.strftime("%Y-%m-%dT%H:%M:%S"),
+                'mm_time': mm_datetime,
+                'depth': Decimal(str(depth)),
+                'latitude': Decimal(str(lat)),
+                'longitude': Decimal(str(lon)),
+                'status': status
             },
-            ConditionExpression="attribute_not_exists(quake_id)"
+            ConditionExpression='attribute_not_exists(quake_id)'
         )
         logger.info(f"✅ Quake {quake_id} saved successfully to DynamoDB.")
-        return True
+        return True  # ✅ New quake saved
 
     except dynamodb.meta.client.exceptions.ConditionalCheckFailedException:
         logger.warning(f"⚠️ Quake {quake_id} already exists. Skipping.")
-        return False
+        return False  # ⚠️ Already existed
 
     except Exception as e:
-        logger.error(f"❌ Failed to save quake {quake_id}: {e}")
+        logger.error(f"❌ Failed to save quake {quake_id}: {str(e)}")
         return False
 
 # === Optional: Run test directly ===

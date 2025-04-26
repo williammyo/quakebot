@@ -13,7 +13,8 @@ class DiscordLogHandler(logging.Handler):
 
          # Skip repetitive low-value logs
         if (
-            "No earthquake detected" in log_entry
+            "No earthquake detected" in log_entry,
+            "Skipping alerts."in log_entry
         ):
             return
         
