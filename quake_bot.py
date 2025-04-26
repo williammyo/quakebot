@@ -355,12 +355,13 @@ async def monitor_loop():
     logger.info("QuakeBot: Bot started. Monitoring every 60s.")
 
     while True:
+        found_new_quake = False  # Track if new quakes are found
+
         new_quakes = fetch_quakes_from_rss()
 
         if new_quakes:
             for quake in new_quakes:
-                # Try saving to DynamoDB first
-                was_saved = save_quake_to_dynamodb(
+                saved = save_quake_to_dynamodb(
                     quake["id"],
                     quake["mag"],
                     quake["date"],
@@ -369,20 +370,17 @@ async def monitor_loop():
                     quake["lon"],
                     "Alerted"
                 )
+                if saved:
+                    found_new_quake = True
+                    await send_alert(bot, quake)
+                    await asyncio.sleep(2)
 
-                if not was_saved:
-                    logger.info(f"⏩ Quake {quake['id']} already saved. Skipping alerts.")
-                    continue  # Skip alert if already exists
+        if not found_new_quake:
+            logger.info("No earthquake detected. Waiting for the next check...")
 
-                logger.info(f"✅ Quake {quake['id']} saved. Proceeding to alert...")
-                await send_alert(bot, quake)
-                await asyncio.sleep(2)  # Rate limit buffer
-        else:
-            logger.info("No earthquake detected. Waiting for the next check....")
-
-        # Heartbeat to show bot is alive
-        write_status("healthy")
+        write_status("healthy")  # ✅ Update heartbeat
         await asyncio.sleep(CHECK_INTERVAL)
+
 
 
 if __name__ == '__main__':
