@@ -1,4 +1,8 @@
-#!/bin/bash
+# SSH into EC2
 cd /home/ec2-user/quakebot
 source .venv/bin/activate
-python main.py
+pip install --upgrade pip
+pip install boto3
+deactivate
+
+
