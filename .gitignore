@@ -15,11 +15,7 @@ venv/
 status.json
 
 # Earthquake state tracking
-chat_ids.txt
-last_*.txt
-broadcasted_quakes.txt
-ignored_quakes.txt
-data/
+copy_DB.py
 
 # OS/Editor stuff
 .DS_Store

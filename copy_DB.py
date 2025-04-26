@@ -7,8 +7,8 @@ region = "us-west-1"  # Change if needed
 dynamodb = boto3.resource('dynamodb', region_name=region)
 
 # Table names
-source_table_name = "QuakeLogs_Test"
-destination_table_name = "EarthquakeLogs"
+source_table_name = "EarthquakeLogs"
+destination_table_name = "QuakeLogs_Test"
 
 # Connect to both tables
 source_table = dynamodb.Table(source_table_name)
