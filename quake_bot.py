@@ -1,16 +1,10 @@
-# ================================ #
-#       Myanmar Quake Bot v1.0     #
-#       Author: William            #
-#       Description: Telegram +    #
-#       Facebook Earthquake Bot    #
-# ================================ #
-
 import os
 import json
 import logging
 import asyncio
 import requests
 import urllib3
+import boto3
 import feedparser
 from io import BytesIO
 from PIL import Image
@@ -27,6 +21,8 @@ from pytz import timezone, utc
 import math
 from fbPost import post_image_to_facebook
 from discord_logger import DiscordLogHandler
+from save_quake import save_quake_to_dynamodb
+from botocore.exceptions import ClientError
 import signal
 import traceback
 
@@ -47,11 +43,24 @@ TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHANNEL_ID = os.getenv("TELEGRAM_CHANNEL_ID")
 CITIES_JSON = "myanmar_cities.json"
 CHECK_INTERVAL = 60
-LAST_EVENT_FILE = "last_quake_text.txt"
+#LAST_EVENT_FILE = "last_quake_text.txt"
 FONT = font_manager.FontProperties(family="Arial Unicode MS") 
 BURMESE_DIGITS = "၀၁၂၃၄၅၆၇၈၉"
 
+# ============ AWS DynamoDB Setup ============ #
+region = os.getenv("AWS_REGION", "us-west-1")
+dynamodb = boto3.resource('dynamodb', region_name=region)
+table = dynamodb.Table('QuakeLogs_Test')
+
 # ============ Utility Functions ============ #
+def quake_exists_in_db(quake_id):
+    try:
+        response = table.get_item(Key={'quake_id': quake_id})
+        return 'Item' in response
+    except ClientError as e:
+        logger.error(f"Error checking quake ID: {e.response['Error']['Message']}")
+        return False
+    
 def get_pacific_time_str():
     pacific = timezone('US/Pacific')
     return datetime.now(pacific).strftime("%H:%M")
@@ -117,15 +126,12 @@ def convert_utc_to_myanmar(utc_str):
 # ============ Fetch & Filter Quakes ============ #
 def fetch_quakes_from_rss():
     feed = feedparser.parse("https://earthquake.tmd.go.th/feed/rss_tmd.xml")
-    broadcasted_ids = load_broadcasted_ids()
-    ignored_ids = load_ignored_quake_ids()
     new_quakes = []
 
     for entry in feed.entries:
         try:
-            title = entry.title
             quake_id = entry.link.split("earthquake=")[-1]
-            if quake_id in broadcasted_ids:
+            if quake_exists_in_db(quake_id):
                 continue
 
             lat = float(entry.get("geo_lat", 0.0))
@@ -136,17 +142,15 @@ def fetch_quakes_from_rss():
             link = entry.link
 
             if mag < 2.0:
-                if quake_id not in ignored_ids:
-                    save_ignored_quake_id(quake_id)
-                    logger.info(f"🟢 Magnitude {mag} earthquake ignored. ({get_pacific_time_str()})")
+                save_quake_to_dynamodb(quake_id, mag, utc_time, depth, lat, lon, "ignored")
+                logger.info(f"🟢 Magnitude {mag} earthquake ignored. ({get_pacific_time_str()})")
                 continue
 
-            is_myanmar = "เมียนมา" in title or "Myanmar" in title
+            is_myanmar = "เมียนมา" in entry.title or "Myanmar" in entry.title
 
             if not is_myanmar and mag < 3.0:
-                if quake_id not in ignored_ids:
-                    save_ignored_quake_id(quake_id)
-                    logger.info(f"🟢 Small quake outside Myanmar ignored. ({get_pacific_time_str()})")
+                save_quake_to_dynamodb(quake_id, mag, utc_time, depth, lat, lon, "Telegram ignored")
+                logger.info(f"🟢 Small quake outside Myanmar ignored. ({get_pacific_time_str()})")
                 continue
 
             logger.info(f"🔔 Magnitude {mag} earthquake detected at ({get_pacific_time_str()}).Initiating Alerts.")
@@ -345,6 +349,7 @@ async def send_alert(bot, quake):
     except TelegramError as e:
         logger.error(f"Telegram error: {e}")
 
+# ============ Main Loop ============ #
 async def monitor_loop():
     bot = Bot(token=TOKEN)
     logger.info("QuakeBot: Bot started. Monitoring every 60s.")
@@ -353,8 +358,15 @@ async def monitor_loop():
         if new_quakes:
             for quake in new_quakes:
                 await send_alert(bot, quake)
-                save_broadcasted_id(quake["id"])
-                save_last_quake_id(quake["id"])
+                save_quake_to_dynamodb(
+                    quake["id"],
+                    quake["mag"],
+                    quake["date"],
+                    quake["depth"],
+                    quake["lat"],
+                    quake["lon"],
+                    "Alerted"
+                )
                 await asyncio.sleep(2)
         else:
             logger.info("No earthquake detected. Waiting for the next check....")
@@ -380,5 +392,5 @@ if __name__ == '__main__':
         logger.critical(f"Unhandled exception in monitor_loop: {error}")
         with open("latest_error.log", "w") as f:
             f.write(error)
-    finally:
+    finally:    
         loop.close()
