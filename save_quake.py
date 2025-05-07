@@ -21,7 +21,7 @@ DYNAMODB_TABLE_NAME = os.getenv("DYNAMODB_TABLE", "EarthquakeLogs")
 try:
     dynamodb_resource = boto3.resource('dynamodb', region_name=AWS_REGION)
     table = dynamodb_resource.Table(DYNAMODB_TABLE_NAME)
-    logger.info(f"Successfully connected to DynamoDB table: {DYNAMODB_TABLE_NAME} in region {AWS_REGION}")
+    logger.info(f"Successfully connected to DynamoDB table: {DYNAMODB_TABLE_NAME} in {AWS_REGION}")
 except Exception as e:
     logger.critical(f"Failed to connect to DynamoDB table {DYNAMODB_TABLE_NAME}: {e}", exc_info=True)
     # Depending on the application, you might want to exit or raise the exception
