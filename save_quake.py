@@ -16,7 +16,7 @@ if not logger.handlers:
 
 # AWS DynamoDB Setup
 AWS_REGION = os.getenv("AWS_REGION", "us-west-1")
-DYNAMODB_TABLE_NAME = os.getenv("DYNAMODB_TABLE", "QuakeLogs_Test")
+DYNAMODB_TABLE_NAME = os.getenv("DYNAMODB_TABLE", "EarthquakeLogs")
 
 try:
     dynamodb_resource = boto3.resource('dynamodb', region_name=AWS_REGION)
