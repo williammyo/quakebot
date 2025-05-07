@@ -1,30 +1,34 @@
+# ========== Standard Library ==========
 import os
 import json
-import logging
+import math
+import signal
 import asyncio
+import logging
+import traceback
+from io import BytesIO
+from datetime import datetime, timedelta, timezone as dt_timezone
+
+# ========== Third-Party Libraries ==========
+import boto3
 import requests
 import urllib3
-import boto3
 import feedparser
-from io import BytesIO
 from PIL import Image
-import matplotlib.pyplot as plt
-from matplotlib.patches import Circle
-from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from telegram import Bot
 from telegram.error import TelegramError
-from matplotlib import font_manager
-from matplotlib.patches import Rectangle
-import matplotlib.patheffects as path_effects
+from matplotlib import pyplot as plt
+from matplotlib.patches import Circle, Rectangle
+from matplotlib import patheffects as path_effects, font_manager
 from pytz import timezone, utc
-import math
+from botocore.exceptions import ClientError
+
+# ========== Local Modules ==========
 from fbPost import post_image_to_facebook
 from discord_logger import DiscordLogHandler
 from save_quake import save_quake_to_dynamodb
-from botocore.exceptions import ClientError
-import signal
-import traceback
+
 
 # ============ Setup & Logging ============ #
 load_dotenv()
@@ -242,7 +246,7 @@ def generate_map(lat, lon, output_file, mag=5.0, depth=10, utc_time=""):
             dt_mm = dt_utc.astimezone(timezone("Asia/Yangon"))
         except Exception:
             logger.warning(f"Invalid UTC time format: '{utc_time}'. Using current UTC time.")
-            dt_mm = datetime.utcnow().replace(tzinfo=utc).astimezone(timezone("Asia/Yangon"))
+            dt_mm = datetime.now(timezone.utc).replace(tzinfo=utc).astimezone(timezone("Asia/Yangon"))
 
         time_str = dt_mm.strftime("%I:%M %p").upper()
         date_str = dt_mm.strftime("%d/%m/%Y").upper()
@@ -298,7 +302,7 @@ def generate_map(lat, lon, output_file, mag=5.0, depth=10, utc_time=""):
 
 def write_status(status: str):
     with open("status.json", "w") as f:
-        json.dump({"status": status, "time": datetime.utcnow().isoformat()}, f)
+        json.dump({"status": status, "time": datetime.now(dt_timezone.utc).isoformat()}, f)
 
 async def send_alert(bot, quake):
     lat = quake["lat"]
@@ -356,7 +360,7 @@ async def send_alert(bot, quake):
 # ============ Main Loop ============ #
 async def monitor_loop():
     bot = Bot(token=TOKEN)
-    logger.info("QuakeBot: Bot started. Monitoring every 60s.")
+    logger.info(f"QuakeBot: Bot started at ({get_pacific_time_str()}). Monitoring every 60s.")
 
     while True:
         found_new_quake = False  # Track if new quakes are found
@@ -380,7 +384,7 @@ async def monitor_loop():
                     await asyncio.sleep(2)
 
         if not found_new_quake:
-            logger.info("No earthquake detected. Waiting for the next check...")
+            logger.info(f"No earthquake detected at ({get_pacific_time_str()}). Waiting for the next check...")
 
         write_status("healthy")  # ✅ Update heartbeat
         await asyncio.sleep(CHECK_INTERVAL)
@@ -403,7 +407,7 @@ if __name__ == '__main__':
     except Exception as e:
         error = traceback.format_exc()
         logger.critical(f"Unhandled exception in monitor_loop: {error}")
-        with open("latest_error.log", "w") as f:
+        with open("latest_error.log", "w", encoding="utf-8") as f:
             f.write(error)
     finally:    
         loop.close()
